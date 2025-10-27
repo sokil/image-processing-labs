@@ -118,18 +118,18 @@ def dump_jpeg(filename):
     shutil.copy(filename, 'patched_' + filename)
     with open('patched_' + filename, "r+b") as w:
         for i, pos in enumerate(restart_segments):
-            if i%3 == 0:
+            if i%5 != 0:
                 continue
 
-            w.seek(pos + 20, 0)
+            w.seek(pos, 0)
 
             if i == len(restart_segments) - 1:
-                length = end_of_scans_pos - pos
+                length = end_of_scans_pos - pos - 2
             else:
-                length = restart_segments[i+1] - pos
+                length = restart_segments[i+1] - pos - 2
 
-            print ("Replace %s bytes from %x" % (length, pos))
-            w.write(b'\xaa' * 20)
+            print ("Replace %s bytes of block %d from 0x%04x" % (length, i, pos))
+            w.write(b'\x00' * (length))
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
